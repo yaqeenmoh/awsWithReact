@@ -1,12 +1,13 @@
+import {Dimensions} from 'react-native';
 const Styles = {
 
     buttonStyle : {
       
         
-        backgroundColor:"red",
+       
         width: 200,
         height:60,
-        backgroundColor:"blue",
+       
         alignItems:"center",
         justifyContent:"center",
         marginTop:300
@@ -26,8 +27,9 @@ const Styles = {
     },
     container:{
         alignItems:"center",
-        height:"100%",
+        paddingVertical: 20,
         backgroundColor:"grey"
+        
         
     }
 }

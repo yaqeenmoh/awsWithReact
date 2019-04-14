@@ -1,7 +1,9 @@
 import React from 'react';
-import {  Text, View , Button , TouchableOpacity , Animated , TextInput } from 'react-native';
-
+import {  Text, View  , TouchableOpacity , Animated , TextInput , ScrollView } from 'react-native';
+import { Button} from 'native-base';
 import Styles from './styles';
+import PostItem from './PostItem'
+import Helper from './Helper';
 
 
 
@@ -10,14 +12,48 @@ export default class Main extends React.Component{
         Anim: new Animated.Value(0), 
         moveAnimation : new Animated.ValueXY({ x: 10, y: 0 }),
         fadeAnim: new Animated.Value(0), 
-        post_value :null
+        post_value :null,
+        post_items : []
         // Initial value for opacity: 0
       }
     constructor(props)
     {
         super(props);
+        this.fetchData();
        
 
+    }
+
+    componentDidMount(){
+     
+    }
+
+    fetchData(){
+     
+      const action = "fetch";
+      fetch(`https://fezrx27gxb.execute-api.us-east-2.amazonaws.com/dev_stage?action=${action}`,
+                                                                           
+      {
+       method:"get",
+       headers: {
+         'Content-Type': 'application/json',
+       },
+    
+
+
+   }
+   ).then((response) => response.json())
+   .then((responseJson) => {
+
+    this.setState({post_items:responseJson.data},()=>{
+      
+    });
+
+     
+
+   }).catch(err=>{
+     alert(err);
+   })
     }
 
     addPost = ()=>{
@@ -34,7 +70,8 @@ export default class Main extends React.Component{
     
 
      
-      fetch('https://fezrx27gxb.execute-api.us-east-2.amazonaws.com/dev_stage?action='+action+'&post='+post,
+      fetch(`https://fezrx27gxb.execute-api.us-east-2.amazonaws.com/dev_stage?action=${action}&post=${post}`,
+                                                                           
        {
         method:"get",
         headers: {
@@ -46,7 +83,10 @@ export default class Main extends React.Component{
     }
     ).then((response) => response.json())
     .then((responseJson) => {
-alert("saving success");
+
+      alert("Posted succeed");
+
+      this.fetchData();
 
     }).catch(err=>{
       alert(err);
@@ -77,10 +117,24 @@ alert("saving success");
     render(){
         let { fadeAnim } = this.state;
 
+        const PostItems = () =>{
+
+        return this.state.post_items.map((item)=>{
+          return <PostItem
+          key ={item.id}
+          data={{
+            body : item.post_body,
+            
+            date : Helper.convertDate(item.create_at)
+          }}  />
+        })
+        }
         return (
             
 
-    <View style={Styles.container}>
+    <ScrollView  contentContainerStyle={Styles.container}>
+  
+   
     <Animated.View           // Special animatable View
     style={this.state.moveAnimation.getLayout()}
     
@@ -103,19 +157,24 @@ placeholderTextColor="#fff"
   style={{opacity:fadeAnim}}
       >
  
-    
-<TouchableOpacity style={Styles.buttonStyle} onPress={this.addPost} >
+
+<Button warning style={Styles.buttonStyle} onPress={this.addPost} >
 
 <Text style={{color:"white"}}>
-    Enter post
+    Add post
 </Text>
 
    
 
-</TouchableOpacity>
+</Button>
 
 </Animated.View>
-    </View>
+<Text style={{marginTop:20 , marginBottom:10 , color:"white"}}>Your Posts</Text>
+
+<PostItems/>
+
+
+    </ScrollView>
         )
     }
 
